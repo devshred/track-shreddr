@@ -10,6 +10,7 @@ import io.jenetics.jpx.geom.Geoid
 import org.apache.commons.lang3.StringUtils
 import org.devshred.tracks.utils.Config
 import java.io.File
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit.SECONDS
 import java.util.function.Consumer
 import java.util.stream.Stream
@@ -65,7 +66,7 @@ fun createTcxFromGpx(gpx: GPX): TrainingCenterDatabase {
             distance += Geoid.WGS84.distance(previous, point).toDouble()
             track.addTrackpoint(
                 Trackpoint(
-                    point.time.get(),
+                    point.time.get().atZone(ZoneId.systemDefault()),
                     Position(point.latitude.toDegrees(), point.longitude.toDegrees()),
                     point.elevation.get().toDouble(),
                     distance
@@ -80,7 +81,7 @@ fun createTcxFromGpx(gpx: GPX): TrainingCenterDatabase {
             course.addCoursePoint(
                 CoursePoint(
                     wayPoint.name.get(),
-                    wayPoint.time.get(),
+                    wayPoint.time.get().atZone(ZoneId.systemDefault()),
                     Position(wayPoint.latitude.toDouble(), wayPoint.longitude.toDouble()),
                     wayPoint.type.get()
                 )

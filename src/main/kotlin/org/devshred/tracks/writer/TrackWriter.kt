@@ -54,7 +54,7 @@ private fun downloadTrack(komootPage: String): Optional<GPX> {
             con.disconnect()
         }
     }
-    return Optional.of(GPX.read(FileUtils.openInputStream(fileCache)))
+    return Optional.of(GPX.read(fileCache.toPath()))
 }
 
 private fun createGpx(
@@ -117,6 +117,6 @@ private fun writeGpx(gpx: GPX, trackName: String) {
         File(gpxDir).mkdir()
     }
     val filenameGpx = gpxDir + trackName.replace(" ", "_") + ".gpx"
-    GPX.writer(" ").write(gpx, filenameGpx)
+    GPX.Writer.of(GPX.Writer.Indent(" "), 20).write(gpx, filenameGpx)
     println("wrote file $filenameGpx")
 }

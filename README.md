@@ -8,3 +8,15 @@ Nun muss nach folgender Anleitung eine credentials.json erstellt und in src/main
 Anschließend noch die Datei ```config.properties.template``` nach ```config.properties``` kopieren und entsprechend anpassen.
 
 Nun kann die Anwendung z.B. mit ```./gradlew run``` gestartet werden.
+
+### credentials.json erstellen
+* IAM & Admin
+* Service Accounts
+* Create Service Account
+* set Service account name
+* Create And Continue
+* Select a role / Basic / Owner
+* Done
+* Under Actions: Manage keys
+* Add Key / Create new key / Key type: JSON
+* Save file as credentials.json

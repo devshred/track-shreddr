@@ -9,13 +9,14 @@ import org.devshred.tracks.waypoints.Coordinates
 import org.devshred.tracks.waypoints.PointOfInterest
 import org.devshred.tracks.waypoints.coordinatesFromDouble
 import org.junit.jupiter.api.Test
+import java.nio.file.Path
 import io.jenetics.jpx.WayPoint.builder as WayPointBuilder
 
 internal class UtilsTest {
     @Test
     fun `calculate distance from GPX file`() {
         val pathToGpxFile = this::class.java.classLoader.getResource("track.gpx").path
-        val gpx = GPX.read(pathToGpxFile)
+        val gpx = GPX.read(Path.of(pathToGpxFile))
         val distance = gpx.distance()
         assertThat(distance).isEqualTo(72)
     }
