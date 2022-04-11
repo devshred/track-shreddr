@@ -10,7 +10,7 @@ import org.devshred.tracks.waypoints.Hotel
 import org.devshred.tracks.waypoints.PoiType
 import org.devshred.tracks.writer.writeTrack
 
-fun main(args: Array<String>) {
+fun main() {
     val spreadsheetId: String = Config.getProp("spreadsheetId")
     val rows: List<List<Any>> = readEtappenplan(spreadsheetId)
 
