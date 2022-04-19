@@ -1,10 +1,13 @@
 package org.devshred.tracks.utils
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import io.jenetics.jpx.GPX
 import io.jenetics.jpx.Track
 import io.jenetics.jpx.TrackSegment
 import io.jenetics.jpx.WayPoint
-import io.jenetics.jpx.geom.Geoid
+import io.jenetics.jpx.geom.Geoid.WGS84
 import org.devshred.tracks.waypoints.Coordinates
 import org.devshred.tracks.waypoints.PointOfInterest
 import org.devshred.tracks.waypoints.coordinatesFromDouble
@@ -13,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.stream.Stream
@@ -56,15 +60,21 @@ fun GPX.distance(): Int {
         .flatMap { obj: Track -> obj.segments() }
         .findFirst()
         .map { obj: TrackSegment -> obj.points() }.orElse(Stream.empty())
-        .collect(Geoid.WGS84.toPathLength())
+        .collect(WGS84.toPathLength())
     return (length.toFloat() / 1000).roundToInt()
+}
+
+fun GPX.findNearestWayPointTo(poi: PointOfInterest, tolerance: Int): Either<BadState, WayPoint> {
+    val nearestWayPoint = findNearestWayPointTo(poi)
+    return if (WGS84.distance(nearestWayPoint, poi.wayPoint()).toInt() > tolerance) BadState.NotOnTrackError.left()
+    else nearestWayPoint.right()
 }
 
 fun GPX.findNearestWayPointTo(poi: PointOfInterest): WayPoint {
     return this.tracks().findFirst().get().segments[0].points.stream()
         .reduce { result: WayPoint, current: WayPoint ->
-            if (Geoid.WGS84.distance(current, poi.wayPoint()).toInt()
-                < Geoid.WGS84.distance(result, poi.wayPoint()).toInt()
+            if (WGS84.distance(current, poi.wayPoint()).toInt()
+                < WGS84.distance(result, poi.wayPoint()).toInt()
             ) current else result
         }.get()
 }
@@ -85,3 +95,7 @@ class Connection(linkAsString: String) : AutoCloseable {
 interface Logging
 
 inline fun <reified T : Logging> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
+
+sealed class BadState {
+    object NotOnTrackError : BadState()
+}

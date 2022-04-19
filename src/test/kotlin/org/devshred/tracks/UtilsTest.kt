@@ -54,6 +54,58 @@ internal class UtilsTest {
     }
 
     @Test
+    fun `should find nearest waypoint if difference to track is in tolerance`() {
+        val gpx = GPX.builder()
+            .addTrack { track: Track.Builder ->
+                track
+                    .addSegment { segment: TrackSegment.Builder ->
+                        segment
+                            .addPoint { p ->
+                                p.lat(0.0).lon(0.0)
+                            }
+                    }
+            }
+            .build()
+
+        val nearestWayPoint = gpx.findNearestWayPointTo(
+            PointOfInterest(
+                Coordinates(
+                    Latitude.ofDegrees(1.0),
+                    Longitude.ofDegrees(0.0)
+                )
+            ), 111_000
+        )
+
+        assertThat(nearestWayPoint.isRight()).isTrue
+    }
+
+    @Test
+    fun `filter out pois too far away from any waypoint of a given track`() {
+        val gpx = GPX.builder()
+            .addTrack { track: Track.Builder ->
+                track
+                    .addSegment { segment: TrackSegment.Builder ->
+                        segment
+                            .addPoint { p ->
+                                p.lat(0.0).lon(0.0)
+                            }
+                    }
+            }
+            .build()
+
+        val nearestWayPoint = gpx.findNearestWayPointTo(
+            PointOfInterest(
+                Coordinates(
+                    Latitude.ofDegrees(1.0),
+                    Longitude.ofDegrees(0.0)
+                )
+            ), 110_000
+        )
+
+        assertThat(nearestWayPoint.isLeft()).isTrue
+    }
+
+    @Test
     fun `get coordinates using link with MAPS_COORDINATES_PATTERN`() {
         val link =
             "https://www.google.de/maps/place/He%C5%99manice+v+Podje%C5%A1t%C4%9Bd%C3%AD+280,+471+25+Jablonn%C3%A9+v+Podje%C5%A1t%C4%9Bd%C3%AD,+Tschechien/@50.7994483,14.7130303,19z/data=!4m5!3m4!1s0x47091586c48ffee1:0x575c11f51d137430!8m2!3d50.7993257!4d14.7136927"

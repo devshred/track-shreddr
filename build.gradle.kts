@@ -32,6 +32,7 @@ dependencies {
     implementation("commons-io:commons-io:2.11.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
+    implementation("io.arrow-kt:arrow-core:1.0.1")
 
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-to-slf4j:$log4jVersion")

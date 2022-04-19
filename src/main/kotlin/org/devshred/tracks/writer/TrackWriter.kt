@@ -1,5 +1,6 @@
 package org.devshred.tracks.writer
 
+import arrow.core.Either
 import io.jenetics.jpx.*
 import org.apache.commons.io.FileUtils
 import org.devshred.tracks.tcx.writeTcx
@@ -57,11 +58,12 @@ private fun downloadTrack(komootPage: String): Optional<GPX> {
     return Optional.of(GPX.read(fileCache.toPath()))
 }
 
-private fun createGpx(
+fun createGpx(
     gpxIn: GPX,
     poIs: Set<CustomPointOfInterest>,
     trackName: String,
-    komootPage: String
+    komootPage: String,
+    tolerance: Int = 300
 ): GPX {
     val trackLink =
         Link.of(komootPage, Config.getProp("tourDescription") + "; " + trackName, "trackOnWeb")
@@ -86,16 +88,19 @@ private fun createGpx(
                 .build()
         )
     poIs
-        .map { poi ->
-            val nearestToPoi: WayPoint = gpxIn.findNearestWayPointTo(poi)
-            WayPoint.builder()
-                .lat(nearestToPoi.latitude)
-                .lon(nearestToPoi.longitude)
-                .time(nearestToPoi.time.get())
-                .name(poi.getName())
-                .sym(poi.getGpxSym())
-                .type(poi.getTcxType())
-                .build()
+        .mapNotNull { poi ->
+            gpxIn.findNearestWayPointTo(poi, tolerance)
+            when (val nearestToPoi = gpxIn.findNearestWayPointTo(poi, tolerance)) {
+                is Either.Left -> null
+                is Either.Right -> WayPoint.builder()
+                    .lat(nearestToPoi.value.latitude)
+                    .lon(nearestToPoi.value.longitude)
+                    .time(nearestToPoi.value.time.get())
+                    .name(poi.getName())
+                    .sym(poi.getGpxSym())
+                    .type(poi.getTcxType())
+                    .build()
+            }
         }
         .sortedWith(compareBy { it.time.get() })
         .forEach { builder.addWayPoint(it) }
