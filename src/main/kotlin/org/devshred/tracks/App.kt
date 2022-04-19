@@ -35,7 +35,7 @@ fun main() {
             val additionalWayPointsLongTrack = additionalWayPoints(spreadsheetId, "WP" + day + "L")
             val wayPointsLongTrack =
                 if (longTrackHasBuffet) additionalWayPointsLongTrack.plus(buffet).plus(hotel)
-                else additionalWayPointsShortTrack.plus(hotel)
+                else additionalWayPointsLongTrack.plus(hotel)
 
             writeTrack(
                 Config.getProp("tourPrefix") + day,
